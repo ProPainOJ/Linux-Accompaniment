@@ -1,0 +1,51 @@
+version: "2.2"
+name: linux-accompaniment
+services:
+  # Postgres
+  postgres-db:
+    container_name: postgres
+    image: postgres:17
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker-init-db/postgres/:/docker-entrypoint-initdb.d/
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: linux-accompaniment
+
+  # MongoDB
+  mongo-db:
+    container_name: mongo
+    image: mongo:8
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+      - ./docker-init-db/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+    environment:
+      MONGO_INITDB_DATABASE: LA
+      MONGO_INITDB_ROOT_USERNAME: mongo-db
+      MONGO_INITDB_ROOT_PASSWORD: mongo-db
+
+
+  # Mongo-express
+  mongo-express-web:
+    container_name: mongo-express
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_CONNECT_RETRIES: 2
+      ME_CONFIG_MONGODB_URL: mongodb://mongo-db:mongo-db@mongo:27017/
+    depends_on:
+      - mongo-db
+
+volumes:
+  postgres-data:
+  mongo-data:
