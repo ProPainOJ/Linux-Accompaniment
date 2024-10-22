@@ -18,8 +18,14 @@ db.createCollection("Notifications", {
                     description: "Полное описание сообщение должно быть `string`!"
                 },
                 action: {
-                    bsonType: "string",
-                    description: "Действие уведомления должно быть `string`!"
+                    bsonType: "array",
+                    description: "Действие уведомления должно быть уникальным `list[str]`!",
+                    minItems: 1,
+                    uniqueItems: true,
+                    items: {
+                        bsonType: "string",
+                        description: "Действие уведомления должно быть `str`!"
+                    }
                 }
             }
         }
@@ -29,7 +35,7 @@ db.createCollection("Notifications", {
 db.Notifications.insertOne({
     _id: ObjectId('670532d3acf02dec8d964037'),
     name: "default message",
-    action: "show",
+    action: ["show"],
     title: "Linux Accompaniment",
     description: "Приложение LA запущено!"
 });
