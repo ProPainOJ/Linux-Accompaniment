@@ -1,8 +1,8 @@
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase, AsyncIOMotorCollection
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from typing_extensions import AsyncGenerator
 
 from exceptions.database import ConfigException
 from property.settings import DataBaseSettings

@@ -52,7 +52,7 @@ class Settings(Singleton):
     @property
     def app_name(self) -> str:
         """Названия приложения."""
-        return self._app_name
+        return self._app_name.strip('"')
 
     @property
     def log_name(self) -> str:

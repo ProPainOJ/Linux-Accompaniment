@@ -14,7 +14,7 @@ class Base(AsyncAttrs, DeclarativeBase):
         return self._my_repr()
 
     def _my_repr(self, field: Optional[dict[str, str | list[str]]] = None) -> str:
-        repr_fields = [f">>> {self.__class__.__name__}({self.__tablename__}): "]
+        repr_fields = [f"{self.__class__.__name__}({self.__tablename__}): "]
         if field is None:
             field = self.__dict__
             field.pop("_sa_instance_state")

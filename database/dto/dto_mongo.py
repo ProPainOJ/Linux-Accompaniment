@@ -25,6 +25,9 @@ class GetNotificationDTO(BaseNotificationDTO, total=False):
     _id: ObjectId
 
 
+class NotificationDTO(GetNotificationDTO, SetNotificationDTO, total=False): pass
+
+
 class BaseNotification(ABC):
     AVAILABLE_ACTION = frozenset({"open_url", "remind", "show"})
 
@@ -32,7 +35,7 @@ class BaseNotification(ABC):
         return self.__dict__()
 
     def __str__(self) -> str:
-        return str(self.__dict__())
+        return f"{self.__class__.__name__}<{id(self)}>: " + str(self.__dict__())
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -44,18 +47,22 @@ class BaseNotification(ABC):
         for key, value in self.notify.items():
             yield key, value
 
-    def __realize_extra_args(self) -> None:
+    def to_dict(self) -> dict[str, MongoTypes]:
+        return self.__dict__()
+
+    def _realize_extra_args(self) -> None:
         """Распаковка `extra_args` в основной словарь."""
         args_key = "extra_args"
         if self.notify.get(args_key):
-            self.notify = self.notify | self.notify[args_key]
+            if self.notify[args_key]:
+                self.notify = self.notify | self.notify[args_key]
             del self.notify[args_key]
 
     @abstractmethod
     def __init__(self, notify: SetNotificationDTO | GetNotificationDTO) -> None:
         self.notify = notify
         self._validate()
-        self.__realize_extra_args()
+        self._realize_extra_args()
 
     @abstractmethod
     def _validate(self, *args, **kwargs) -> ValidationException | None:
@@ -92,7 +99,6 @@ class GetNotification(BaseNotification):
 
     def __init__(self, notify: GetNotificationDTO) -> None:
         super().__init__(notify)
-        self.notify = self._validate()
 
     def _validate(self) -> ValidationException | None:
         pass
