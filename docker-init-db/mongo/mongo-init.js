@@ -3,12 +3,8 @@ db.createCollection("Notifications", {
         $jsonSchema: {
             bsonType: "object",
             title: "Валидатор уведомлений пользователя",
-            required: ["name", "title", "action"],
+            required: ["title", "action"],
             properties: {
-                name: {
-                    bsonType: "string",
-                    description: "Название сообщения должно быть `string`!"
-                },
                 title: {
                     bsonType: "string",
                     description: "Заголовок сообщения должен быть `string`!"
@@ -34,7 +30,6 @@ db.createCollection("Notifications", {
 
 db.Notifications.insertOne({
     _id: ObjectId('670532d3acf02dec8d964037'),
-    name: "default message",
     action: ["show"],
     title: "Linux Accompaniment",
     description: "Приложение LA запущено!"

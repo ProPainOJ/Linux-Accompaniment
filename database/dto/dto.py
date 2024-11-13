@@ -37,7 +37,7 @@ class Reminder(Base):
         primary_key=True,
         server_default=text("gen_random_uuid()")
     )
-
+    name: Mapped[str] = mapped_column(comment="Имя уведомления.")
     create_data = mapped_column(Date, comment="Дата создания уведомления.")
     target_data = mapped_column(Date, comment="Дата исполнения уведомления.")
     target_time = mapped_column(Time, comment="Время исполнения уведомления.")
@@ -45,6 +45,7 @@ class Reminder(Base):
     mongo_uuid: Mapped[str] = mapped_column(comment="Ссылка на тело уведомления.")
     urgency_id: Mapped[int] = mapped_column(comment="ID уровня важности уведомления.")
     repeat_id: Mapped[int] = mapped_column(comment="ID повторения уведомления.")
+    category_id: Mapped[int] = mapped_column(comment="ID категории уведомления.")
 
     def __repr__(self):
         return super()._my_repr({
@@ -55,3 +56,13 @@ class Reminder(Base):
                 self.target_data.strftime("%Y-%m-%d"),
             ]
         })
+
+
+class Category(Base):
+    __tablename__ = "category"
+
+    id: Mapped[int] = mapped_column(primary_key=True, comment="ID категории уведомлений."
+                                    )
+    name: Mapped[str] = mapped_column(comment="Название категории.")
+    description: Mapped[str] = mapped_column(comment="Подробное описание повторений.")
+    create_date = mapped_column(Date, comment="Дата создания категории повторений.")

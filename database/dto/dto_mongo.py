@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict, NotRequired
 
+from attr import dataclass
 from bson import ObjectId
 
+from database.dto.dto import Reminder
 from exceptions.app import ValidationException
 from property.helpers import cust_join
 
@@ -15,7 +17,6 @@ class BaseNotificationDTO(TypedDict):
 
 
 class SetNotificationDTO(BaseNotificationDTO):
-    name: str
     action: list[str]
     title: str
     description: NotRequired[str]
@@ -77,20 +78,23 @@ class CreateNotification(BaseNotification):
 
     def __getitem__(self, item: KeyTypes) -> MongoTypes:
         if item not in self.notify:
-            raise ValueError(f"Недопустимый ключ - <{item}>! Доступные ключи [{cust_join(self.notify.keys())}]")
+            raise ValueError(f"Недопустимый ключ - <{item}>! Доступные ключи [{cust_join(tuple(self.notify.keys()))}]")
         return self.notify[item]
 
     def _validate(self) -> ValidationException | None:
         validated_field, bad_params = "action", ()
-        if len(self.notify["name"]) == 0 or len(self.notify["title"]) == 0:
-            raise ValidationException("Длинна аргументов `name` и `title` должны быть более 0!")
-        for param in self.notify[validated_field]:
-            if param not in self.AVAILABLE_ACTION:
-                bad_params += (param,)
+        if len(self.notify["title"]) == 0:
+            raise ValidationException("Длинна аргумента `title` должны быть более 0!")
+        if isinstance(self.notify[validated_field], str) and self.notify[validated_field] in self.AVAILABLE_ACTION:
+            self.notify[validated_field] = [self.notify[validated_field]]
+        else:
+            for param in self.notify[validated_field]:
+                if param not in self.AVAILABLE_ACTION:
+                    bad_params += (param,)
         if bad_params:
             raise ValidationException(
                 msg=f"Недопустимые аргументы `action` - [{cust_join(bad_params)}]!"
-                    f" Доступные параметры [{cust_join(self.AVAILABLE_ACTION)}]"
+                    f" Доступные параметры [{cust_join(tuple(self.AVAILABLE_ACTION))}]"
             )
         return
 
@@ -102,3 +106,9 @@ class GetNotification(BaseNotification):
 
     def _validate(self) -> ValidationException | None:
         pass
+
+
+@dataclass
+class FullNotificationDTO:
+    postgres_notify: Reminder
+    mongo_notify: CreateNotification

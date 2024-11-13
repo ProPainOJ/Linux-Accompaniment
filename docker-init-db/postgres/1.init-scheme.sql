@@ -33,9 +33,27 @@ COMMENT ON COLUMN public.repeat."count" IS 'Период повторений.';
 COMMENT ON COLUMN public.repeat.description IS 'Подробное описание повторений.';
 
 
+--- Table category
+CREATE TABLE public.category (
+	id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
+	"name" VARCHAR(40) NOT NULL,
+	description VARCHAR NULL,
+	create_date DATE DEFAULT CURRENT_DATE,
+	CONSTRAINT category_pk PRIMARY KEY (id)
+);
+COMMENT ON TABLE public.repeat IS 'Таблица с категориями уведомлений.';
+
+-- repeat`s column comments
+COMMENT ON COLUMN public.category.id IS 'ID категории уведомлений.';
+COMMENT ON COLUMN public.category."name" IS 'Название категории.';
+COMMENT ON COLUMN public.category.description IS 'Подробное описание повторений.';
+COMMENT ON COLUMN public.category.create_date IS 'Дата создания категории повторений.';
+
+
 --- Table reminder
 CREATE TABLE public.reminder (
 	"uuid" UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+	name VARCHAR NOT NULL,
 	create_data DATE DEFAULT CURRENT_DATE,
     target_data DATE NOT NULL,
     target_time TIME NOT NULL,
@@ -43,13 +61,16 @@ CREATE TABLE public.reminder (
 	mongo_uuid VARCHAR(24) NOT NULL UNIQUE,
 	urgency_id INT NOT NULL,
 	repeat_id INT DEFAULT NULL,
+	category_id INT DEFAULT NULL,
 	CONSTRAINT reminder_urgency_fk FOREIGN KEY (urgency_id) REFERENCES public.urgency(id),
-	CONSTRAINT reminder_repeat_fk FOREIGN KEY (repeat_id) REFERENCES public.repeat(id)
+	CONSTRAINT reminder_repeat_fk FOREIGN KEY (repeat_id) REFERENCES public.repeat(id),
+	CONSTRAINT reminder_category_fk FOREIGN KEY (category_id) REFERENCES public.category(id)
 );
 COMMENT ON TABLE public.reminder IS 'Напоминания пользователя.';
 
 -- reminder`s column comments
 COMMENT ON COLUMN public.reminder."uuid" IS 'ID уведомления.';
+COMMENT ON COLUMN public.reminder.name IS 'Имя уведомления.';
 COMMENT ON COLUMN public.reminder.create_data IS 'Дата создания уведомления.';
 COMMENT ON COLUMN public.reminder.target_data IS 'Дата исполнения уведомления.';
 COMMENT ON COLUMN public.reminder.target_time IS 'Время исполнения уведомления.';
@@ -57,3 +78,4 @@ COMMENT ON COLUMN public.reminder.status IS 'Статус выполнения.'
 COMMENT ON COLUMN public.reminder.mongo_uuid IS 'Ссылка на тело уведомления.';
 COMMENT ON COLUMN public.reminder.urgency_id IS 'ID уровня важности уведомления.';
 COMMENT ON COLUMN public.reminder.repeat_id IS 'ID повторения уведомления.';
+COMMENT ON COLUMN public.reminder.category_id IS 'ID категории к которой относится уведомление.';
