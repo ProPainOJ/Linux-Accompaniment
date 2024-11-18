@@ -26,5 +26,5 @@ class NotificationsRepository(BaseRepository):
     async def create_objects(self, new_objects: list[CreateNotification]):
         return await self.motor.insert_many([new_object.__dict__() for new_object in new_objects])
 
-    async def delete_objects_by_ids(self, del_object_list: list[ObjectId]) -> DeleteResult:
+    async def delete_objects(self, del_object_list: list[ObjectId]) -> DeleteResult:
         return await self.motor.delete_many({"_id": {"$in": del_object_list}})
