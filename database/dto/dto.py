@@ -31,29 +31,31 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class Reminder(Base):
     __tablename__ = "reminder"
+    _time_format: str = "%H:%M:%S"
+    _data_format: str = "%Y-%m-%d"
 
     uuid: Mapped[UUID] = mapped_column(
         UUID,
         primary_key=True,
         server_default=text("gen_random_uuid()")
     )
-    name: Mapped[str] = mapped_column(comment="Имя уведомления.")
+    name: Mapped[str] = mapped_column(comment="Имя уведомления.", nullable=False)
     create_data = mapped_column(Date, comment="Дата создания уведомления.")
-    target_data = mapped_column(Date, comment="Дата исполнения уведомления.")
-    target_time = mapped_column(Time, comment="Время исполнения уведомления.")
-    status: Mapped[bool] = mapped_column(comment="Статус выполнения.")
-    mongo_uuid: Mapped[str] = mapped_column(comment="Ссылка на тело уведомления.")
-    urgency_id: Mapped[int] = mapped_column(comment="ID уровня важности уведомления.")
+    target_data = mapped_column(Date, comment="Дата исполнения уведомления.", nullable=False)
+    target_time = mapped_column(Time, comment="Время исполнения уведомления.", nullable=False)
+    status: Mapped[bool] = mapped_column(comment="Статус выполнения.", default=False)
+    mongo_uuid: Mapped[str] = mapped_column(comment="Ссылка на тело уведомления.", nullable=False)
+    urgency_id: Mapped[int] = mapped_column(comment="ID уровня важности уведомления.", nullable=False, default=1)
     repeat_id: Mapped[int] = mapped_column(comment="ID повторения уведомления.")
-    category_id: Mapped[int] = mapped_column(comment="ID категории уведомления.")
+    category_id: Mapped[int] = mapped_column(comment="ID категории уведомления.", default=1)
 
     def __repr__(self):
         return super()._my_repr({
             "uuid": self.uuid,
             "mongo_uuid": self.mongo_uuid,
             "target <time|data>": [
-                self.target_time.strftime("%H:%M:%S"),
-                self.target_data.strftime("%Y-%m-%d"),
+                self.target_time.strftime(self._time_format),
+                self.target_data.strftime(self._data_format),
             ]
         })
 

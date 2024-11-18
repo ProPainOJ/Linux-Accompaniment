@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict, NotRequired
 
-from attr import dataclass
 from bson import ObjectId
 
-from database.dto.dto import Reminder
 from exceptions.app import ValidationException
 from property.helpers import cust_join
 
@@ -106,9 +104,3 @@ class GetNotification(BaseNotification):
 
     def _validate(self) -> ValidationException | None:
         pass
-
-
-@dataclass
-class FullNotificationDTO:
-    postgres_notify: Reminder
-    mongo_notify: CreateNotification
