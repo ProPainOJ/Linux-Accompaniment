@@ -2,4 +2,5 @@ aiohttp==3.10.8
 sqlalchemy[asyncio]==2.0.35
 asyncpg==0.29.0
 motor==3.6.0
-keyboard==0.13.5
+pyautogui==0.9.54
+pynput==1.7.7
