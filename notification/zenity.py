@@ -214,7 +214,7 @@ class Zenity(BaseNotify):
 
     @__check_zen_param
     def throw_list_args(self, columns: FormsFields, return_column_number: int = 0, checklist: bool = False,
-                        radiolist: bool = False, edit: bool = False, ) -> None:
+                        radiolist: bool = False, edit: bool = False, text: str = '') -> None:
         """
 
         :param columns: Тело таблицы.
@@ -268,6 +268,7 @@ class Zenity(BaseNotify):
                 self._expression.append(value)
             index += 1
             table_column_count -= 1
+        self._expression.append(self.ZENITY_ARGS["text"](text))
 
     @__check_zen_param
     def throw_entry_args(self, entry_description: str = "", entry_text: tuple[str, ...] = None,

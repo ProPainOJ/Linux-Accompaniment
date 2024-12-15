@@ -29,6 +29,7 @@ class NotificationDTO(GetNotificationDTO, SetNotificationDTO, total=False): pass
 
 class BaseNotification(ABC):
     AVAILABLE_ACTION = frozenset({"open_url", "remind", "show"})
+    EXTRA_ARGS: str = "extra_args"
 
     def __call__(self) -> SetNotificationDTO:
         return self.__dict__()
@@ -46,16 +47,18 @@ class BaseNotification(ABC):
         for key, value in self.notify.items():
             yield key, value
 
+    def __getitem__(self, item: KeyTypes) -> MongoTypes:
+        return self.notify[item]
+
     def to_dict(self) -> dict[str, MongoTypes]:
         return self.__dict__()
 
     def _realize_extra_args(self) -> None:
         """Распаковка `extra_args` в основной словарь."""
-        args_key = "extra_args"
-        if self.notify.get(args_key):
-            if self.notify[args_key]:
-                self.notify = self.notify | self.notify[args_key]
-            del self.notify[args_key]
+        if self.notify.get(self.EXTRA_ARGS):
+            if self.notify[self.EXTRA_ARGS]:
+                self.notify = self.notify | self.notify[self.EXTRA_ARGS]
+            del self.notify[self.EXTRA_ARGS]
 
     @abstractmethod
     def __init__(self, notify: SetNotificationDTO | GetNotificationDTO) -> None:
@@ -99,8 +102,16 @@ class CreateNotification(BaseNotification):
 
 class GetNotification(BaseNotification):
 
-    def __init__(self, notify: GetNotificationDTO) -> None:
-        super().__init__(notify)
+    def __init__(self, notify_dict: dict[KeyTypes, MongoTypes]) -> None:
+        self.notify = NotificationDTO()  # type: ignore
+        extra_args = {}
+        for key, value in notify_dict.items():  # type: KeyTypes, MongoTypes
+            if key not in NotificationDTO.__annotations__.keys() and key != self.EXTRA_ARGS:
+                extra_args |= {key: value}
+            else:
+                self.notify |= {key: value}
+        else:
+            self.notify |= {self.EXTRA_ARGS: extra_args}
 
     def _validate(self) -> ValidationException | None:
         pass

@@ -7,17 +7,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.database import DataBasesSessionsManager
 from database.dto.dto import Base, Reminder
-from database.dto.dto_mongo import CreateNotification
+from database.dto.dto_mongo import BaseNotification
 from property.settings import Settings
 
 CLS = TypeVar("CLS", bound=Base)
+MCLS = TypeVar("MCLS", bound=BaseNotification)
 
 
 @dataclass
 class FullDBObjectNotification:
-    postgres_notify: Reminder
-    mongo_notify: CreateNotification
+    postgres_notify: Reminder | None
+    mongo_notify: MCLS | None
 
+
+    def __str__(self):
+        return "12"
 
 class BaseRepository(ABC):
     settings = Settings()

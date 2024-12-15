@@ -11,14 +11,18 @@ class NotificationsRepository(BaseRepository):
         self.motor = DataBasesSessionsManager.get_mongo_db_motor()
 
     async def get_by_filter(self, filters: GetNotification | dict[str, MongoTypes] | None = None,
-                            fields: dict[str, bool] = None, length: None | int = None) -> list[dict]:
+                            fields: dict[str, bool] = None, length: None | int = None) -> list[GetNotification]:
         if fields is None:
             fields = {}
         if filters is None:
             filters = {}
         if isinstance(filters, GetNotification):
             filters = filters.to_dict()
-        return await self.motor.find(filters, fields).to_list(length=length)
+        return [
+            GetNotification(mongo_obj)
+            for mongo_obj in
+            await self.motor.find(filters, fields).to_list(length=length)
+        ]
 
     async def get_by_id(self, _id: ObjectId) -> dict:
         return await self.motor.find_one({"_id": _id})

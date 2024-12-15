@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Any, Sequence
 
+from pynput.keyboard import Key, KeyCode
 from typing_extensions import TypeVar
 
 K = TypeVar("K")
@@ -51,3 +52,22 @@ def get_key_dict_by_value(_dict: dict[K, V], _dict_value: V, first_key: bool = T
     if not first_key:
         return tuple((key for key, value in _dict.items() if value == _dict_value)) or None
     return next((key for key, value in _dict.items() if value == _dict_value), None)
+
+
+def get_hotkey(hotkey: tuple[Key | KeyCode | str, ...]) -> str:
+    """Создание строки с горячими клавишами.
+
+    :param hotkey: Сочетание клавиш.
+
+    :return: Строка с сочетанием клавиш в формате <keyboard.Key.name>+KeyCode.name
+    """
+    hotkeys = ()
+    for key in hotkey:
+        if isinstance(key, Key):
+            hotkeys += (f"<{key.name}>",)
+        elif isinstance(key, KeyCode):
+            hotkeys += (f"{key.char}",)
+        else:
+            hotkeys += (key,)
+
+    return cust_join(hotkeys, "+")

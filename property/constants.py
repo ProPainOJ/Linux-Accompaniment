@@ -1,4 +1,15 @@
-from enum import Enum
+from property.patterns import BaseEnum
+
+
+class AppMenuAction(BaseEnum):
+    """Имена действий в меню приложений."""
+    create: str = "создать"
+    show: str = "просмотр"
+    delete: str = "удалить"
+    del_all: str = "удалить все‼"
+    update: str = "обновить"
+    conform: str = "подтвердить"
+
 
 NOTIFICATIONS: dict[str, str] = {
     "time_break": "Пора сделать перерыв для глаз!\nПрошло ({0}) мин. Время рабочей сессии (~{1} час.)"
@@ -34,9 +45,24 @@ ZENITY = {  # Поля и др. константы окон Zenity.
     },
     "menu": {
         "column_list": {
-            "": ("create", "show"),
-            "Действие": ("Создать", "Просмотреть"),
-            "Описание": ("Создание нового напоминания", "Просмотр всех созданных напоминаний"),
+            "": (
+                AppMenuAction.create.name,
+                AppMenuAction.show.name,
+                AppMenuAction.update.name,
+                AppMenuAction.delete.name
+            ),
+            "Действие": (
+                AppMenuAction.create.capitalize(),
+                AppMenuAction.show.capitalize(),
+                AppMenuAction.update.capitalize(),
+                AppMenuAction.delete.capitalize(),
+            ),
+            "Описание": (
+                "Создание нового напоминания",
+                "Просмотр всех созданных напоминаний",
+                "Обновление ваших напоминаний",
+                "Удаление уведомлений по фильтру и т.д."
+            ),
         }
     },
 }
@@ -52,10 +78,7 @@ ZENITY_FORMS_FIELDS: dict[str, str] = {  # Список полей для вво
 }
 
 
-class NotifyUrgency(str, Enum):
+class NotifyUrgency(BaseEnum):
     LOW: str = "low"
     NORMAL: str = "normal"
     CRIT: str = "critical"
-
-    def __str__(self) -> str:
-        return str.__str__(self)
